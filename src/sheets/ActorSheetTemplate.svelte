@@ -1,6 +1,5 @@
 <script>
    import { onMount } from "svelte";
-   import TextEditField from "./TextEditField.svelte";
 
    export let elementRoot;
 

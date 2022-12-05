@@ -1,4 +1,3 @@
-import { fix_and_outro_and_destroy_block } from "svelte/internal";
 import os4eBaseSheet from "../core/os4eBaseSheet";
 import ActorSheetTemplate from "./ActorSheetTemplate.svelte";
 
