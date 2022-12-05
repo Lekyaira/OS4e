@@ -32,20 +32,3 @@
 <ApplicationShell bind:elementRoot>
    <svelte:component this={component} bind:elementRoot={elementRoot} bind:data={data} update={update} editImage={editImage} />
 </ApplicationShell>
- 
-<style lang="scss">
-/*   main {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-   }
-
-   header {
-      display: flex;
-   }
-
-   header img {
-      width: 6rem;
-      height: 6rem;
-   }*/
-</style>

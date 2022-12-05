@@ -24,15 +24,17 @@ export default class os4eBaseSheet extends SvelteApplication
 
       // Callback to update actor data
       this.#updateData = (data) => this.object.update(data);
+
       // Callback up render file picker and update data when portrait is clicked.
       this.#editImage = (data) =>
       {
+         // TODO: Replace with Tokenizer-like functionality.
          // Instantiate a new file picker
          const picker = new FilePicker();
          // When the file is picked...
          picker.callback = (e) =>
          {
-            // Update the returned data object iwth the newly
+            // Update the returned data object with the newly
             // picked image path.
             data.img = e;
             // Send the data back to the component
@@ -58,7 +60,7 @@ export default class os4eBaseSheet extends SvelteApplication
       return foundry.utils.mergeObject(super.defaultOptions, {
          title: 'OS4e.title',  // Automatically localized from `lang/en.json`.
          width: 600,
-         height: 800,
+         height: 400,
 
          svelte: {
             class: BaseSheetTemplate,

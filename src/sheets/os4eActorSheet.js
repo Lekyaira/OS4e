@@ -1,3 +1,4 @@
+import { fix_and_outro_and_destroy_block } from "svelte/internal";
 import os4eBaseSheet from "../core/os4eBaseSheet";
 import ActorSheetTemplate from "./ActorSheetTemplate.svelte";
 
@@ -11,5 +12,14 @@ export default class os4eActorSheet extends os4eBaseSheet
     constructor(object = {}, options = {})
     {
         super(object, options, ActorSheetTemplate);
+    }
+
+    static get defaultOptions()
+    {
+        return foundry.utils.mergeObject(super.defaultOptions, 
+            {
+                width: 700,
+                height: 900
+            });
     }
 }
