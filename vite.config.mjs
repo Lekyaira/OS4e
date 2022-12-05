@@ -29,7 +29,7 @@ export default () =>
    /** @type {import('vite').UserConfig} */
    return {
       root: 'src/',                             // Source location / esbuild root.
-      base: '/modules/template-svelte-esm/',    // Base module path that 30001 / served dev directory.
+      base: '/systems/os4e/',    // Base module path that 30001 / served dev directory.
       publicDir: false,                         // No public resources to copy.
       cacheDir: '../.vite-cache',               // Relative from root directory.
 
@@ -56,14 +56,14 @@ export default () =>
          port: 30001,
          open: '/game',
          proxy: {
-            '^(/modules/template-svelte-esm/lang)': 'http://localhost:30000',
-            '^(?!/modules/template-svelte-esm/)': 'http://localhost:30000',
+            '^(/systems/os4e/lang)': 'http://localhost:30000',
+            '^(?!/systems/os4e/)': 'http://localhost:30000',
             '/socket.io': { target: 'ws://localhost:30000', ws: true }
          }
       },
 
       build: {
-         outDir: __dirname,
+         outDir: `${__dirname}/dist`,
          emptyOutDir: false,
          sourcemap: s_SOURCEMAPS,
          brotliSize: true,

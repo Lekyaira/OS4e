@@ -1,6 +1,6 @@
 {
-  "name": "template-svelte-esm",
-  "description": "Provides a bare-bones Foundry module template repo to get set up with using the TyphonJS Runtime Library and Svelte with ES Modules.",
+  "name": "os4e",
+  "description": "Old-school/OSR D&D4e Inpsired System.",
   "license": "MIT",
   "private": true,
   "type": "module",
