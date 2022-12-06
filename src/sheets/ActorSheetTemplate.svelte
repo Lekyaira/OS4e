@@ -1,5 +1,5 @@
 <script>
-   import { onMount } from "svelte";
+   import { onMount, afterUpdate } from "svelte";
 
    export let elementRoot;
 
@@ -23,31 +23,173 @@
       window.$('input').on('change', () => update(data));
       window.$('input').attr('disabled', !editMode);
    });
+
+   ////////////////////////////////////////////
+   // Handle portrait re-positioning on drag //
+   ////////////////////////////////////////////
+   let pos = {x: 0, y: 0};
+	let start = {x: 0, y: 0};
+	let offset = {x: 0, y: 0};
+	let objectPosition = {x: 0, y: 0};
+	let imgStart = {x: 0, y: 0};
+	let draggingPortrait = false;
+	const objectFits = ["none", "cover", "contain", "scaled-down", "fill"];
+	let objectFit = objectFits[1];
+	let holdDelay;
+	
+	let img;
+	let imgBounds = {};
+	let imgDimensions = {};
+	let imgScaledDimensions = {};
+	let imgLimit = {};
+
+   afterUpdate(async ()=> {
+		imgBounds = {
+			width: img.clientWidth,
+			height: img.clientHeight
+		}
+		imgDimensions = {
+			width: img.naturalWidth,
+			height: img.naturalHeight
+		};
+		imgScaledDimensions = getContainedSize(img);
+		if(objectFit == "none"){
+			imgLimit = {
+				x: (imgDimensions.width - imgBounds.width) * -1,
+				y: (imgDimensions.height - imgBounds.height) * -1
+			}
+		}
+		else if(objectFit == "cover"){
+			imgLimit = {
+				x: (imgScaledDimensions.width - imgBounds.width) * -1,
+				y: (imgScaledDimensions.height - imgBounds.height) * -1
+			}
+		}
+		else {
+			imgLimit = {x: 0, y: 0};
+		}
+
+      // Update portrait image position from saved data
+      if(data.system.portraitPosition){
+         objectPosition = data.system.portraitPosition;
+      }
+	}); 
+	
+	function onPointerMove(event){
+		if(draggingPortrait){
+			pos.x = event.clientX;
+			pos.y = event.clientY;
+			offset.x = pos.x - start.x;
+			offset.y = pos.y - start.y;
+			objectPosition.x = imgStart.x + offset.x;
+			objectPosition.y = imgStart.y + offset.y;
+			if(objectPosition.x > 0) objectPosition.x = 0;
+			else if(objectPosition.x < imgLimit.x) objectPosition.x = imgLimit.x;
+			if(objectPosition.y > 0) objectPosition.y = 0;
+			else if(objectPosition.y < imgLimit.y) objectPosition.y = imgLimit.y;
+		}
+	}
+	
+	function onPointerDown(e){
+		holdDelay = setTimeout(()=>{
+			draggingPortrait = true;
+			start.x = e.clientX;
+			start.y = e.clientY;
+			imgStart.x = objectPosition.x;
+			imgStart.y = objectPosition.y;
+		}, 200);
+	}
+	
+	function onPointerUp(e){
+		clearTimeout(holdDelay);
+		setTimeout(()=>{
+			draggingPortrait = false;
+			start.x = 0;
+			start.y = 0;
+			offset.x = 0;
+			offset.y = 0;
+         data.system.portraitPosition = objectPosition;
+         update(data);
+		}, 50);
+	}
+	
+	function onMouseLeave() {
+		onPointerUp();
+	}
+	
+	function getContainedSize(img) {
+		var ratio = img.naturalWidth/img.naturalHeight
+		var width = img.height*ratio
+		var height = img.height
+		if (width < img.width) {
+			width = img.width
+			height = img.width/ratio
+		}
+		width = Math.round(width);
+		height = Math.round(height);
+		return {width: width, height: height};
+    }
  </script>
   
  <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
  <svelte:options accessors={true}/>
 
-<main>
+<main 
+   on:pointermove={editMode ? onPointerMove : ''} 
+   on:pointerup={editMode ? onPointerUp : ''}
+   on:mouseleave={editMode ? onMouseLeave : ''}>
+
    <i id="edit-button" class="fas fa-pen-to-square"
       on:click={() => editMode = !editMode}
       on:keypress
       style:color={editMode ? 'black' : 'gray'} />
    <header>
-      <img src={data.img} alt={data.name} 
-         on:click={editMode ? editImage(data) : ''} 
+      <img src={data.img} alt="{data.name}'s portrait" bind:this={img}
+         class:editMode
+         style:object-position={`${objectPosition.x}px ${objectPosition.y}px`}
+         style:object-fit={objectFit}
+         on:click={editMode && !draggingPortrait ? editImage(data) : ''} 
+         on:pointerdown={editMode ? onPointerDown : ''}
          on:keypress />
+      <div id="portraitTooltip">
+         <div>Click to change portrait.</div>
+         <div>Drag to re-position.</div>
+      </div>
       <section id="info-block">
          <section id="title-block">
             <input id="name" type="text" bind:value={data.name} />
             <span id="title">Level 1 Beastkin Fighter</span>
          </section>
          <section id="ability-scores">
-            <span>Strength 10</span>
-            <span>Dexterity 10</span>
-            <span>Charisma 10</span>
-            <span>Intelligence 10</span>
-            <span>Luck 10</span>
+            <section id="score-labels">
+               <span>Strength</span>
+               <span>Dexterity</span>
+               <span>Charisma</span>
+               <span>Intelligence</span>
+               <span>Luck</span>
+            </section>
+            <section id="score-base-values" class="score-values"
+                     style:display={editMode ? "initial" : "none"}>
+               <input type="number" id="score-base-strength" value=10 />
+               <input type="number" id="score-base-dexterity" value=10 />
+               <input type="number" id="score-base-charisma" value=10 />
+               <input type="number" id="score-base-intelligence" value=10 />
+               <input type="number" id="score-base-luck" value=10 />
+            </section>
+            <section id="score-derived-values" class="score-values">
+               <span>10</span>
+               <span>10</span>
+               <span>10</span>
+               <span>10</span>
+               <span>10</span>
+            </section>
+            <section id="score-modifiers" class="score-values">
+               <span>(+0)</span>
+               <span>(+0)</span>
+               <span>(+0)</span>
+               <span>(+0)</span>
+               <span>(+0)</span>
+            </section>
          </section>
       </section>
    </header>
@@ -80,27 +222,87 @@
    }
 
    header img {
-      width: 20rem;
+      width: 15rem;
       height: 20rem;
+      object-fit:cover;
+      box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.3);
+      /*box-shadow: 1px 1px 2px gray;*/
+      /*object-position: 50% 50%;*/
+   }
+
+   header #portraitTooltip {
+      display: none;
+      position: absolute;
+      top: 19.5rem;
+      left: 4rem;
+      font-size: 0.7rem;
+      padding: 0.3rem;
+      width: 8rem;
+      border: 1px solid black;
+      background-color: lightgray;
+      box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.3);
+   }
+
+   header .editMode {
+      /*border-color: blue;*/
+      box-shadow: 0px 0px 5px rgba(0,0,255,0.7);
+   }
+
+   header .editMode:hover {
+      /*border-color: red;*/
+      box-shadow: 0 0 5px red;
+   }
+
+   header .editMode:hover + #portraitTooltip {
+      display: block;
    }
 
    header #name {
-      width: 21.2rem;
+      width: 26.2rem;
       height: 3rem;
       font-size: 2rem;
    }
 
    #title-block {
+      display: flex;
+      flex-direction: column;
       margin-bottom: 1rem;
       border-bottom: 1px solid;
    }
 
    #title {
-      font-size: 1.1rem;
+      font-size: 1.4rem;
    }
 
    #ability-scores {
       display: flex;
+      flex-direction: row;
+      font-size: 1rem;
+   }
+   
+   #ability-scores span {
+      height: 1.3rem;
+   }
+
+   #ability-scores input {
+      height: 1.3rem;
+   }
+
+   #ability-scores section {
+      display: flex;
       flex-direction: column;
+      margin-left: 0.2rem;
+   }
+
+   #ability-scores #score-labels {
+      width: 6rem;
+   }
+
+   #ability-scores .score-values {
+      width: 2rem;
+   }
+
+   #ability-scores #score-derived-values {
+      width: 1.5rem;
    }
  </style>
