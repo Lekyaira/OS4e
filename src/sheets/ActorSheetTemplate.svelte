@@ -1,5 +1,6 @@
 <script>
    import { onMount, afterUpdate } from "svelte";
+   import { formatModifier } from "../stats.js"
 
    export let elementRoot;
 
@@ -170,25 +171,65 @@
             </section>
             <section id="score-base-values" class="score-values"
                      style:display={editMode ? "initial" : "none"}>
-               <input type="number" id="score-base-strength" value=10 />
-               <input type="number" id="score-base-dexterity" value=10 />
-               <input type="number" id="score-base-charisma" value=10 />
-               <input type="number" id="score-base-intelligence" value=10 />
-               <input type="number" id="score-base-luck" value=10 />
+               <input type="number" id="score-base-strength" bind:value={data.system.abilities.strength} />
+               <input type="number" id="score-base-dexterity" bind:value={data.system.abilities.dexterity} />
+               <input type="number" id="score-base-charisma" bind:value={data.system.abilities.charisma} />
+               <input type="number" id="score-base-intelligence" bind:value={data.system.abilities.intelligence} />
+               <input type="number" id="score-base-luck" bind:value={data.system.abilities.luck} />
             </section>
             <section id="score-derived-values" class="score-values">
-               <span>10</span>
-               <span>10</span>
-               <span>10</span>
-               <span>10</span>
-               <span>10</span>
+               <span>{data.derived.strength}</span>
+               <span>{data.derived.dexterity}</span>
+               <span>{data.derived.charisma}</span>
+               <span>{data.derived.intelligence}</span>
+               <span>{data.derived.luck}</span>
             </section>
             <section id="score-modifiers" class="score-values">
-               <span>(+0)</span>
-               <span>(+0)</span>
-               <span>(+0)</span>
-               <span>(+0)</span>
-               <span>(+0)</span>
+               <span>({formatModifier(data.derived.str)})</span>
+               <span>({formatModifier(data.derived.dex)})</span>
+               <span>({formatModifier(data.derived.cha)})</span>
+               <span>({formatModifier(data.derived.int)})</span>
+               <span>({formatModifier(data.derived.luk)})</span>
+            </section>
+            <section id="defense-labels">
+               <span>Fortitude</span>
+               <span>Reflexes</span>
+               <span>Will</span>
+               <span>Insight</span>
+            </section>
+            <section id="defense-values" class="score-values">
+               <span>{data.derived.fortitude}</span>
+               <span>{data.derived.reflexes}</span>
+               <span>{data.derived.will}</span>
+               <span>{data.derived.insight}</span>
+            </section>
+         </section>
+         <section id="stats">
+            <section>
+               <span>HP</span>
+               <span>WP</span>
+               <span>Armor</span>
+            </section>
+            <section>
+               <span>1</span>
+               <span>5</span>
+            </section>
+            <section>
+               <span>/</span>
+               <span>/</span>
+            </section>
+            <section>
+               <span>1</span>
+               <span>5</span>
+               <span>0</span>
+            </section>
+            <section>
+               <span>XP</span>
+               <span>SP</span>
+            </section>
+            <section>
+               <span>0</span>
+               <span>{data.derived.sp}sq.</span>
             </section>
          </section>
       </section>
@@ -278,6 +319,9 @@
       display: flex;
       flex-direction: row;
       font-size: 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid;
    }
    
    #ability-scores span {
@@ -304,5 +348,51 @@
 
    #ability-scores #score-derived-values {
       width: 1.5rem;
+   }
+
+   #ability-scores #defense-labels {
+      margin-left: 4rem;
+      width: 5rem;
+   }
+
+   #stats {
+      display: flex;
+      flex-direction: row;
+      font-size: 1.2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid;
+   }
+
+   #stats section {
+      display: flex;
+      flex-direction: column;
+   }
+
+   #stats section:first-child {
+      width: 2rem;
+   }
+
+   #stats section:first-child + section {
+      width: 2rem;
+      align-items: center;
+   }
+
+   #stats section:first-child + section + section {
+      width: 1rem;
+      align-items: center;
+   }
+
+   #stats section:first-child + section + section + section {
+      width: 2rem;
+      align-items: center;
+   }
+
+   #stats section:first-child + section + section + section + section {
+      width: 2rem;
+      margin-left: 4rem;
+   }
+
+   #stats section:first-child + section + section + section + section + section {
+      width: 12rem;
    }
  </style>

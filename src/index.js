@@ -13,9 +13,15 @@ Hooks.once("init", async () =>
     CONFIG.Item.documentClass = os4eItem;
 
     Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet("os4e", os4eActorSheet, { makeDefault: true });
+    Actors.registerSheet("os4e", os4eActorSheet, { 
+        types: ["character"],
+        makeDefault: true 
+    });
     Items.unregisterSheet("core", ItemSheet);
-    Items.registerSheet("os4e", os4eItemSheet, { makeDefault: true });
+    Items.registerSheet("os4e", os4eItemSheet, { 
+        types: ["item"],
+        makeDefault: true 
+    });
 
     console.log("OS4E | Initialization complete!");
 });

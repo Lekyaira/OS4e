@@ -19,11 +19,13 @@ export default class os4eBaseSheet extends SvelteApplication
          id: object.id,
          name: object.name,
          img: object.img,
-         system: object.system
+         system: object.system,
+         derived: object.derived
       };
 
       // Callback to update actor data
       this.#updateData = (data) => this.object.update(data);
+
 
       // Callback up render file picker and update data when portrait is clicked.
       this.#editImage = (data) =>
