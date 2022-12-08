@@ -30,7 +30,7 @@ export default () =>
    return {
       root: 'src/',                             // Source location / esbuild root.
       base: '/systems/os4e/',    // Base module path that 30001 / served dev directory.
-      publicDir: false,                         // No public resources to copy.
+      publicDir: 'public',                         // No public resources to copy.
       cacheDir: '../.vite-cache',               // Relative from root directory.
 
       resolve: { conditions: ['import', 'browser'] },
