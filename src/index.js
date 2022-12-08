@@ -1,6 +1,7 @@
 import os4eActor from './os4eActor.js';
 import os4eItem from './os4eItem.js';
 import os4eActorSheet from './sheets/os4eActorSheet.js';
+import os4eContainerSheet from './sheets/os4eContainerSheet.js';
 import os4eItemSheet from './sheets/os4eItemSheet.js';
 
 // Hooks.once('ready', () => new BasicApplication().render(true, { focus: true }));
@@ -18,6 +19,9 @@ Hooks.once("init", async () =>
         makeDefault: true 
     });
     Items.unregisterSheet("core", ItemSheet);
+    Items.registerSheet("os4e", os4eContainerSheet, {
+        types: ["container"]
+    });
     Items.registerSheet("os4e", os4eItemSheet, { 
         types: ["item"],
         makeDefault: true 
