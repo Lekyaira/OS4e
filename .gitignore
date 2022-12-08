@@ -4,6 +4,7 @@
 .vscode/**/*
 !.vscode/extensions.json
 dist/
+dist
 node_modules/
 /index.js
 /index.js.map
