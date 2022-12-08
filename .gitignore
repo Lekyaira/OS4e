@@ -5,8 +5,6 @@
 !.vscode/extensions.json
 dist/
 dist
-!dist/system.json
-!dist/template.json
 node_modules/
 /index.js
 /index.js.map
