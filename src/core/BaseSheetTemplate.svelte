@@ -38,7 +38,6 @@
 
    async function refreshSheet()
    {
-      console.log("Refreshed!");
       data = data;
    }
 </script>

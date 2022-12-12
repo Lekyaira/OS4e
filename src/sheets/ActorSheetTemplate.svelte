@@ -148,6 +148,9 @@
       }
    }
 
+   ////////////////////////////////
+   // Handle Inventory Functions //
+   ////////////////////////////////
    async function addNewItem()
    {
       const itemData = [{ name: "New Item", type: "item" }];
@@ -194,6 +197,7 @@
             <input id="name" type="text" bind:value={data.name} />
             <span id="title">Level 1 Beastkin Fighter</span>
          </section>
+<!--Ability Scores-->
          <section id="ability-scores">
             <section id="score-labels">
                <span>Strength</span>
@@ -224,6 +228,7 @@
                <span>({formatModifier(data.derived.int)})</span>
                <span>({formatModifier(data.derived.luk)})</span>
             </section>
+<!--Defenses-->
             <section id="defense-labels">
                <span>Fortitude</span>
                <span>Reflexes</span>
@@ -237,6 +242,7 @@
                <span>{data.derived.insight}</span>
             </section>
          </section>
+<!--Stats-->
          <section id="stats">
             <section>
                <span>HP</span>
@@ -268,13 +274,22 @@
       </section>
    </header>
    <section id="body">
+<!--Inventory-->
       <section id="inventory">
-         <span class="inventory-title">Inventory</span>
+         <span class="inventory-title">Equipment</span>
          {#each data.derived.inventory as slot}
             <div class="inventory-row">
                <span class="inventory-type" class:editMode>{slotTypeToText(slot.type)}</span>
                <div class="inventory-block">
-                  <span class="inventory-item"></span>
+                  {#each slot.items as item}
+                     {#if item.item == undefined}
+                        <span class="inventory-item">
+                           <i class="fas fa-plus" />
+                        </span>
+                     {:else}
+                        <span class="inventory-item">{item.item.name}</span>
+                     {/if}
+                  {/each}
                </div>
             </div>
          {/each}

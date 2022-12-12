@@ -82,6 +82,7 @@ export default class os4eActor extends Actor
         {
             let s = 0;
             let a = [];
+            let j = 0;
             if (this.system.inventory && i < this.system.inventory.length)
             {
                 s = this.system.inventory[i].type;
@@ -95,8 +96,17 @@ export default class os4eActor extends Actor
                             id: item,
                             item: undefined
                         });
+                        j++;
                     }
                 }
+                
+            }
+            for (let k = 0; k < this.getNumSlots(s) - j; k++)
+            {
+                a.push({
+                    id: undefined,
+                    item: undefined
+                });
             }
             derived.inventory.push({
                 type: s,
@@ -166,6 +176,19 @@ export default class os4eActor extends Actor
                     derived.looseItems.push(item);
                 }
             }
+        }
+    }
+
+    getNumSlots(type)
+    {
+        switch (type)
+        {
+            case 0: return 1;
+            case 1: return 5;
+            case 2: return 3;
+            case 3: return 2;
+            case 5: return 1;
+            default: return 0;
         }
     }
 }
