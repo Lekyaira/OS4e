@@ -4,6 +4,8 @@
 
    export let elementRoot;
 
+   export let sheet;
+
    // Actor data passed in from os4eActorSheet.js
    export let data;
 
@@ -133,20 +135,35 @@
     }
 
 
-    function slotTypeToText(slot)
-    {
-        switch (slot)
-        {
-            case 0: return 'E';
-            case 1: return 'B';
-            case 2: return 'S';
-            case 3: return 'P';
-            case 4: return 'Q';
-            default: return 'E';
-        }
-    }
+   function slotTypeToText(slot)
+   {
+      switch (slot)
+      {
+         case 0: return 'E';
+         case 1: return 'B';
+         case 2: return 'S';
+         case 3: return 'P';
+         case 4: return 'Q';
+         default: return 'E';
+      }
+   }
 
-    console.log(data.derived.looseItems);
+   async function addNewItem()
+   {
+      const itemData = [{ name: "New Item", type: "item" }];
+      await Item.create(itemData, { parent: sheet.actor });
+      data.derived = data.derived;
+   }
+
+   async function deleteItem(item)
+   {
+      console.log(data.derived);
+      await Item.deleteDocuments([item.id], { parent: sheet.actor });
+      console.log(sheet.actor);
+      console.log(data.derived);
+      data.derived = data.derived;
+      console.log(data.derived);
+   }
  </script>
   
  <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
@@ -262,11 +279,15 @@
                </div>
             </div>
          {/each}
+         <i class="fas fa-plus" on:click={addNewItem} on:keypress>New</i>
          {#if data.derived.looseItems.length > 0}
             <span class="inventory-title">Loose Items</span>
          {/if}
          {#each data.derived.looseItems as item}
-            <span class="inventory-item">{item.name}</span>
+            <span class="inventory-item">
+               {item.name}
+               <i class="fas fa-trash-can" on:click={deleteItem(item)} on:keypress />
+            </span>
          {/each}
       </section>
    </section>

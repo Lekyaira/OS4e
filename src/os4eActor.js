@@ -77,6 +77,7 @@ export default class os4eActor extends Actor
 
         derived.items = new Map();
         derived.inventory = [];
+        derived.looseItems = [];
         for (let i = 0; i < derived.encumbrance; i++)
         {
             let s = 0;
@@ -104,6 +105,9 @@ export default class os4eActor extends Actor
         }
 
         this.prepareItems();
+
+        console.log("OS4E | prepareDerivedData");
+        console.log(derived);
 
         // Set speed
         // derived.sp = (derived.species['sp'] ? derived.species.sp : 6);

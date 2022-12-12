@@ -75,6 +75,7 @@ export default class os4eBaseSheet extends SvelteApplication
             props: function() 
             {
                return {
+                  sheet: this,
                   data: this.#data,
                   callbacks: this.#callbacks,
                   // update: this.#updateData,

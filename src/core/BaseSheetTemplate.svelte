@@ -4,6 +4,9 @@
  
    export let elementRoot;
 
+   // Sheet class
+   export let sheet;
+
    // Actor data passed in from os4eActorSheet.js
    export let data;
 
@@ -39,5 +42,5 @@
 <!-- ApplicationShell provides the popOut / application shell frame, header bar, content areas -->
 <!-- ApplicationShell exports `elementRoot` which is the outer application shell element -->
 <ApplicationShell bind:elementRoot>
-   <svelte:component this={component} bind:elementRoot={elementRoot} bind:data={data} callbacks={callbacks} />
+   <svelte:component this={component} bind:elementRoot={elementRoot} bind:sheet={sheet} bind:data={data} callbacks={callbacks} />
 </ApplicationShell>

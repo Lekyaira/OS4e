@@ -3,7 +3,7 @@ import ActorSheetTemplate from "./ActorSheetTemplate.svelte";
 
 export default class os4eActorSheet extends os4eBaseSheet
 {
-    get Actor() 
+    get actor() 
     {
         return this.object;
     }
