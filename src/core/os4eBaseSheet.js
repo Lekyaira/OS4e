@@ -78,12 +78,15 @@ export default class os4eBaseSheet extends SvelteApplication
                   sheet: this,
                   data: this.#data,
                   callbacks: this.#callbacks,
-                  // update: this.#updateData,
-                  // editImage: this.#editImage,
                   component: this.#component,
                };
             }
          }
       });
+   }
+
+   async refresh()
+   {
+      this.#data.refresh();
    }
 }

@@ -9,6 +9,7 @@
 
    // Actor data passed in from os4eActorSheet.js
    export let data;
+   data.refresh = refreshSheet;
 
    // Inner component
    export let component = false;
@@ -34,6 +35,12 @@
    {
       window.$('input').on('change', () => callbacks.update(data));
    });
+
+   async function refreshSheet()
+   {
+      console.log("Refreshed!");
+      data = data;
+   }
 </script>
  
 <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->

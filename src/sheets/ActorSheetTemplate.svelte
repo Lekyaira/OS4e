@@ -152,17 +152,16 @@
    {
       const itemData = [{ name: "New Item", type: "item" }];
       await Item.create(itemData, { parent: sheet.actor });
-      data.derived = data.derived;
    }
 
    async function deleteItem(item)
    {
-      console.log(data.derived);
       await Item.deleteDocuments([item.id], { parent: sheet.actor });
-      console.log(sheet.actor);
-      console.log(data.derived);
-      data.derived = data.derived;
-      console.log(data.derived);
+   }
+
+   async function editItem(item)
+   {
+      item.sheet.render(true);
    }
  </script>
   
@@ -285,7 +284,9 @@
          {/if}
          {#each data.derived.looseItems as item}
             <span class="inventory-item">
+               <img src="{item.img}" alt="{item.name}" />
                {item.name}
+               <i class="fas fa-pen-to-square" on:click={editItem(item)} on:keypress />
                <i class="fas fa-trash-can" on:click={deleteItem(item)} on:keypress />
             </span>
          {/each}
@@ -496,5 +497,11 @@
       align-self: flex-end;
       width: 10rem;
       border-bottom: 1px solid;
+   }
+
+   #inventory .inventory-item img {
+      width: 1rem;
+      height: 1rem;
+      border: none;
    }
  </style>

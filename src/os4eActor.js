@@ -106,8 +106,8 @@ export default class os4eActor extends Actor
 
         this.prepareItems();
 
-        console.log("OS4E | prepareDerivedData");
-        console.log(derived);
+        // Refresh the Svelte sheet's data
+        this.sheet.refresh();
 
         // Set speed
         // derived.sp = (derived.species['sp'] ? derived.species.sp : 6);
