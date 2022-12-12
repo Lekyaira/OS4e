@@ -31,7 +31,10 @@ export default class os4eActor extends Actor
         reflexes: 10,
         will: 10,
         insight: 10,
-        armor: 0
+        armor: 0,
+
+        encumbrance: 5,
+        inventory: []
     };
 
     prepareDerivedData() 
@@ -67,6 +70,27 @@ export default class os4eActor extends Actor
         derived.insight = 5 + derived.int;
         derived.armor = 0;
 
+        // Encumbrance
+        derived.encumbrance = 5 + derived.str;
+
+        derived.inventory = [];
+        for (let i = 0; i < derived.encumbrance; i++)
+        {
+            let s = 0;
+            let a = [];
+            if (this.system.inventory && i < this.system.inventory.length)
+            {
+                s = this.system.inventory[i].type;
+                a = this.system.inventory[i].items;
+            }
+            derived.inventory.push({
+                type: s,
+                items: a
+            });
+        }
+
+        this.prepareItems();
+
         // Set speed
         // derived.sp = (derived.species['sp'] ? derived.species.sp : 6);
         // derived.fours = (derived.species['fours'] ? derived.species.fours : 0);
@@ -81,5 +105,10 @@ export default class os4eActor extends Actor
 
         // // Set WP
         // data.wp.max = 5 /* <-- This will be set by class later */ + derived.cha + (derived.species['wp'] ? derived.species.wp : 0);
+    }
+
+    prepareItems()
+    {
+
     }
 }

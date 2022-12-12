@@ -7,9 +7,10 @@ export default class os4eBaseSheet extends SvelteApplication
    #updateData;
    #editImage;
    #component;
+   #callbacks = {};
    object;
 
-   constructor(object = {}, options = {}, component = false) 
+   constructor(object = {}, options = {}, component = false, callbacks = {}) 
    {
       super(options);
 
@@ -23,12 +24,16 @@ export default class os4eBaseSheet extends SvelteApplication
          derived: object.derived
       };
 
+      this.#callbacks = callbacks;
+
       // Callback to update actor data
-      this.#updateData = (data) => this.object.update(data);
+      // this.#updateData = (data) => this.object.update(data);
+      this.#callbacks.update = (data) => this.object.update(data);
 
 
       // Callback up render file picker and update data when portrait is clicked.
-      this.#editImage = (data) =>
+      // this.#editImage = (data) =>
+      this.#callbacks.editImage = (data) =>
       {
          // TODO: Replace with Tokenizer-like functionality.
          // Instantiate a new file picker
@@ -71,8 +76,9 @@ export default class os4eBaseSheet extends SvelteApplication
             {
                return {
                   data: this.#data,
-                  update: this.#updateData,
-                  editImage: this.#editImage,
+                  callbacks: this.#callbacks,
+                  // update: this.#updateData,
+                  // editImage: this.#editImage,
                   component: this.#component,
                };
             }

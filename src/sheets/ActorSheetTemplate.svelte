@@ -7,11 +7,13 @@
    // Actor data passed in from os4eActorSheet.js
    export let data;
 
-   // Callback to allow os4eActorSheet.js to update the actor data.
-   export let update = () => {};
+   export let callbacks;
 
-   // Callback to render file picker when portrait is clicked.
-   export let editImage = () => {};
+   // // Callback to allow os4eActorSheet.js to update the actor data.
+   // export let update = () => {};
+
+   // // Callback to render file picker when portrait is clicked.
+   // export let editImage = () => {};
 
    // Toggles document edit mode
    let editMode = false;
@@ -21,7 +23,6 @@
    // Set all inputs to update on change
    onMount(async () =>
    {
-      window.$('input').on('change', () => update(data));
       window.$('input').attr('disabled', !editMode);
    });
 
@@ -110,7 +111,7 @@
 			offset.x = 0;
 			offset.y = 0;
          data.system.portraitPosition = objectPosition;
-         update(data);
+         callbacks.update(data);
 		}, 50);
 	}
 	
@@ -129,6 +130,20 @@
 		width = Math.round(width);
 		height = Math.round(height);
 		return {width: width, height: height};
+    }
+
+
+    function slotTypeToText(slot)
+    {
+        switch (slot)
+        {
+            case 0: return 'E';
+            case 1: return 'B';
+            case 2: return 'S';
+            case 3: return 'P';
+            case 4: return 'Q';
+            default: return 'E';
+        }
     }
  </script>
   
@@ -149,7 +164,7 @@
          class:editMode
          style:object-position={`${objectPosition.x}px ${objectPosition.y}px`}
          style:object-fit={objectFit}
-         on:click={editMode && !draggingPortrait ? editImage(data) : ''} 
+         on:click={editMode && !draggingPortrait ? callbacks.editImage(data) : ''} 
          on:pointerdown={editMode ? onPointerDown : ''}
          on:keypress />
       <div id="portraitTooltip">
@@ -234,6 +249,20 @@
          </section>
       </section>
    </header>
+   <section id="body">
+      <section id="inventory">
+         <span class="inventory-title">Inventory</span>
+         {#each data.derived.inventory as slot}
+            <div class="inventory-row">
+               <span class="inventory-type" class:editMode>{slotTypeToText(slot.type)}</span>
+               <div class="inventory-block">
+                  <span class="inventory-item"></span>
+               </div>
+            </div>
+         {/each}
+         <span class="inventory-title">Loose Items</span>
+      </section>
+   </section>
 </main>
   
  <style lang="scss">
@@ -284,7 +313,7 @@
       box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.3);
    }
 
-   header .editMode {
+   .editMode {
       /*border-color: blue;*/
       box-shadow: 0px 0px 5px rgba(0,0,255,0.7);
    }
@@ -394,5 +423,50 @@
 
    #stats section:first-child + section + section + section + section + section {
       width: 12rem;
+   }
+
+   #body {
+      display: flex;
+      flex-direction: row;
+   }
+
+   #inventory {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-top: 0.4rem;
+   }
+
+   #inventory .inventory-title {
+      font-size: 1.3rem;
+      text-align: center;
+      margin: 0.4rem 0 0.4rem 0
+   }
+
+   #inventory .inventory-row {
+      display: flex;
+      flex-direction: row;
+      margin: 0.1rem;
+   }
+
+   #inventory .inventory-type {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 1px solid;
+   }
+
+   #inventory .inventory-block {
+      align-self: flex-end;
+      margin-left: 0.2rem;
+   }
+
+   #inventory .inventory-item {
+      display: flex;
+      align-self: flex-end;
+      width: 10rem;
+      border-bottom: 1px solid;
    }
  </style>

@@ -16,16 +16,16 @@
             "hp": 1,
             "wp": 5,
             "xp": 0,
-            "level": 1
+            "level": 1,
+
+            "inventory": [
+                {"type": 0, "items": []}
+            ]
         }
     },
 
     "Item": {
-        "types": ["container", "item"],
-        "container": {
-            "slots": 1,
-            "contains": []
-        },
+        "types": ["item"],
         "item": {
             "price": 0,
             "size": 1,

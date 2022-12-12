@@ -3,12 +3,15 @@
  
     // Item data passed in from os4eItemSheet.js
     export let data;
+
+    // Callbacks
+    export let callbacks;
  
     // Callback to allow os4eItemSheet.js to update the actor data.
-    export let update = () => {};
+   //  export let update = () => {};
  
-    // Callback to render file picker when portrait is clicked.
-    export let editImage = () => {};
+   //  // Callback to render file picker when portrait is clicked.
+   //  export let editImage = () => {};
  </script>
   
  <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
@@ -16,8 +19,8 @@
 
 <main>
     <header>
-    <img src={data.img} alt={data.name} on:click={editImage(data)} on:keypress={()=>{}} />
-    <input type="text" bind:value={data.name} on:change={update(data)} />
+    <img src={data.img} alt={data.name} on:click={callbacks.editImage(data)} on:keypress={()=>{}} />
+    <input type="text" bind:value={data.name} />
     </header>
 </main>
   
