@@ -34,7 +34,9 @@ export default class os4eActor extends Actor
         armor: 0,
 
         encumbrance: 5,
-        inventory: []
+        items: {},
+        inventory: [],
+        looseItems: []
     };
 
     prepareDerivedData() 
@@ -73,6 +75,7 @@ export default class os4eActor extends Actor
         // Encumbrance
         derived.encumbrance = 5 + derived.str;
 
+        derived.items = new Map();
         derived.inventory = [];
         for (let i = 0; i < derived.encumbrance; i++)
         {
@@ -81,7 +84,18 @@ export default class os4eActor extends Actor
             if (this.system.inventory && i < this.system.inventory.length)
             {
                 s = this.system.inventory[i].type;
-                a = this.system.inventory[i].items;
+                // a = this.system.inventory[i].items;
+                if (this.system.inventory[i].items.length)
+                {
+                    for (const item of this.system.inventory[i].items)
+                    {
+                        derived.items.set(item.id, derived.inventory[i].items);
+                        a.push({
+                            id: item,
+                            item: undefined
+                        });
+                    }
+                }
             }
             derived.inventory.push({
                 type: s,
@@ -109,6 +123,45 @@ export default class os4eActor extends Actor
 
     prepareItems()
     {
+        const derived = this.derived;
+        let hasSpecies = false;
 
+        for (const item of this.items)
+        {
+            if (item.type === "species")
+            {
+                // There can be only one. Delete the rest.
+                if (hasSpecies)
+                {
+                    item.delete();
+                }
+                else
+                {
+                    // Add the species
+                    derived.species = item;
+                    hasSpecies = true;
+
+                    // TODO: Do bonuses
+                }
+            }
+            else if (item.type === "item")
+            {
+                if (derived.items.has(item.id))
+                {
+                    for (const i of derived.items.get(item.id))
+                    {
+                        if (i.id === item.id)
+                        {
+                            i.item = item;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    derived.looseItems.push(item);
+                }
+            }
+        }
     }
 }

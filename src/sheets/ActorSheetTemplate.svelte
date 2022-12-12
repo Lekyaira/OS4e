@@ -145,6 +145,8 @@
             default: return 'E';
         }
     }
+
+    console.log(data.derived.looseItems);
  </script>
   
  <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
@@ -260,7 +262,12 @@
                </div>
             </div>
          {/each}
-         <span class="inventory-title">Loose Items</span>
+         {#if data.derived.looseItems.length > 0}
+            <span class="inventory-title">Loose Items</span>
+         {/if}
+         {#each data.derived.looseItems as item}
+            <span class="inventory-item">{item.name}</span>
+         {/each}
       </section>
    </section>
 </main>
