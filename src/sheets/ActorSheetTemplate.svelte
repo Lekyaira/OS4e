@@ -2,31 +2,22 @@
     import { onMount, afterUpdate } from "svelte";
     import { formatModifier } from "../stats.js"
 
-    export let elementRoot;
 
+    // Sheet and Actor data passed in from base sheet.
     export let sheet;
-
-    // Actor data passed in from os4eActorSheet.js
-    export let data;
-
-    export let callbacks;
-
-    // // Callback to allow os4eActorSheet.js to update the actor data.
-    // export let update = () => {};
-
-    // // Callback to render file picker when portrait is clicked.
-    // export let editImage = () => {};
+    export let doc;
+    // Set actor variable so we can refer to it later.
+    const actor = doc;
 
     // Toggles document edit mode
     let editMode = false;
 
+    // Disable all inputs when editMode is false, and enable them when true.
     $: window.$('input').attr('disabled', !editMode);
-
-    // Set all inputs to update on change
-    onMount(async () =>
-    {
-            window.$('input').attr('disabled', !editMode);
-        });
+    // Make sure inputs continue to behave this way.
+    onMount(async () => {
+        window.$('input').attr('disabled', !editMode);
+    });
 
     ////////////////////////////////////////////
     // Handle portrait re-positioning on drag //
@@ -74,8 +65,8 @@
         }
 
         // Update portrait image position from saved data
-        if(data.system.portraitPosition){
-            objectPosition = data.system.portraitPosition;
+        if(actor.system.portraitPosition){
+            objectPosition = actor.system.portraitPosition;
         }
     }); 
 
@@ -112,8 +103,9 @@
             start.y = 0;
             offset.x = 0;
             offset.y = 0;
-            data.system.portraitPosition = objectPosition;
-            callbacks.update(data);
+            actor.system.portraitPosition = objectPosition;
+            // Save actor data to Foundry database.
+            actor.update({_id: actor.id, system: {portraitPosition: objectPosition}});
         }, 50);
     }
 
@@ -134,56 +126,26 @@
         return {width: width, height: height};
     }
 
-
-    function slotTypeToText(slot)
-{
-        switch (slot)
-            {
-            case 0: return 'E';
-            case 1: return 'B';
-            case 2: return 'S';
-            case 3: return 'P';
-            case 4: return 'Q';
-            default: return 'E';
-        }
-    }
-
     ////////////////////////////////
     // Handle Inventory Functions //
     ////////////////////////////////
     async function addNewItem(item, i, j)
     {
         console.log("OS4E | addNewItem");
-        // Create a new empty item
-        const itemData = [{ name: "New Item", type: "item" }];
-        const newItem = await Item.create(itemData, { parent: sheet.actor });
-        // if we're adding a loose item
-        if (item === undefined){
-            return;
-        }
-        if (item.id) {      // If this item slot is already filled
-            // TODO: Add item to next available slot
-            return;
-        }
-        
-        console.log(i);
-        console.log(j);
-        // Add new item to current item slot
-        console.log(data.system);
-        data.system.inventory[i].items[j].id = newItem[0].id;
-        console.log(data.system.inventory);
+        // TODO: Add some cool item adding code here!
     }
 
     async function deleteItem(item)
     {
-        await Item.deleteDocuments([item.id], { parent: sheet.actor });
+        await Item.deleteDocuments([item.id], { parent: actor });
     }
 
     async function editItem(item)
     {
         item.sheet.render(true);
     }
-    </script>
+
+</script>
 
 <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
 <svelte:options accessors={true}/>
@@ -198,11 +160,11 @@
         on:keypress
         style:color={editMode ? 'black' : 'gray'} />
     <header>
-        <img src={data.img} alt="{data.name}'s portrait" bind:this={img}
+        <img src={actor.img} alt="{actor.name}'s portrait" bind:this={img}
             class:editMode
             style:object-position={`${objectPosition.x}px ${objectPosition.y}px`}
             style:object-fit={objectFit}
-            on:click={editMode && !draggingPortrait ? callbacks.editImage(data) : ''} 
+            on:click={editMode && !draggingPortrait ? sheet.editImage() : ''} 
             on:pointerdown={editMode ? onPointerDown : ''}
             on:keypress />
         <div id="portraitTooltip">
@@ -211,7 +173,7 @@
         </div>
         <section id="info-block">
             <section id="title-block">
-                <input id="name" type="text" bind:value={data.name} />
+                <input id="name" name="name" type="text" bind:value={actor.name} />
                 <span id="title">Level 1 Beastkin Fighter</span>
             </section>
             <!--Ability Scores-->
@@ -225,25 +187,25 @@
                 </section>
                 <section id="score-base-values" class="score-values"
                     style:display={editMode ? "initial" : "none"}>
-                    <input type="number" id="score-base-strength" bind:value={data.system.abilities.strength} />
-                    <input type="number" id="score-base-dexterity" bind:value={data.system.abilities.dexterity} />
-                    <input type="number" id="score-base-charisma" bind:value={data.system.abilities.charisma} />
-                    <input type="number" id="score-base-intelligence" bind:value={data.system.abilities.intelligence} />
-                    <input type="number" id="score-base-luck" bind:value={data.system.abilities.luck} />
+                    <input type="number" id="score-base-strength" name="system.abilities.strength" bind:value={actor.system.abilities.strength} />
+                    <input type="number" id="score-base-dexterity" name="system.abilities.dexterity" bind:value={actor.system.abilities.dexterity} />
+                    <input type="number" id="score-base-charisma" name="system.abilities.charisma" bind:value={actor.system.abilities.charisma} />
+                    <input type="number" id="score-base-intelligence" name="system.abilities.intelligence" bind:value={actor.system.abilities.intelligence} />
+                    <input type="number" id="score-base-luck" name="system.abilities.luck" bind:value={actor.system.abilities.luck} />
                 </section>
                 <section id="score-derived-values" class="score-values">
-                    <span>{data.derived.strength}</span>
-                    <span>{data.derived.dexterity}</span>
-                    <span>{data.derived.charisma}</span>
-                    <span>{data.derived.intelligence}</span>
-                    <span>{data.derived.luck}</span>
+                    <span>{actor.derived.strength}</span>
+                    <span>{actor.derived.dexterity}</span>
+                    <span>{actor.derived.charisma}</span>
+                    <span>{actor.derived.intelligence}</span>
+                    <span>{actor.derived.luck}</span>
                 </section>
                 <section id="score-modifiers" class="score-values">
-                    <span>({formatModifier(data.derived.str)})</span>
-                    <span>({formatModifier(data.derived.dex)})</span>
-                    <span>({formatModifier(data.derived.cha)})</span>
-                    <span>({formatModifier(data.derived.int)})</span>
-                    <span>({formatModifier(data.derived.luk)})</span>
+                    <span>({formatModifier(actor.derived.str)})</span>
+                    <span>({formatModifier(actor.derived.dex)})</span>
+                    <span>({formatModifier(actor.derived.cha)})</span>
+                    <span>({formatModifier(actor.derived.int)})</span>
+                    <span>({formatModifier(actor.derived.luk)})</span>
                 </section>
                 <!--Defenses-->
                 <section id="defense-labels">
@@ -253,10 +215,10 @@
                     <span>Insight</span>
                 </section>
                 <section id="defense-values" class="score-values">
-                    <span>{data.derived.fortitude}</span>
-                    <span>{data.derived.reflexes}</span>
-                    <span>{data.derived.will}</span>
-                    <span>{data.derived.insight}</span>
+                    <span>{actor.derived.fortitude}</span>
+                    <span>{actor.derived.reflexes}</span>
+                    <span>{actor.derived.will}</span>
+                    <span>{actor.derived.insight}</span>
                 </section>
             </section>
             <!--Stats-->
@@ -285,7 +247,7 @@
                 </section>
                 <section>
                     <span>0</span>
-                    <span>{data.derived.sp}sq.</span>
+                    <span>{actor.derived.sp}sq.</span>
                 </section>
             </section>
         </section>
@@ -293,35 +255,35 @@
     <section id="body">
         <!--Inventory-->
         <section id="inventory">
-            <span class="inventory-title">Equipment</span>
-            {#each data.derived.inventory as slot, i}
-                <div class="inventory-row">
-                    <span class="inventory-type" class:editMode>{slotTypeToText(slot.type)}</span>
-                    <div class="inventory-block">
-                        {#each slot.items as item, j}
-                            {#if item.item == undefined}
-                                <span class="inventory-item">
-                                    <i class="fas fa-plus" on:click={addNewItem(item, i, j)} />
-                                </span>
-                            {:else}
-                                <span class="inventory-item">{item.item.name}</span>
-                            {/if}
-                        {/each}
-                    </div>
-                </div>
-            {/each}
-            <i class="fas fa-plus" on:click={addNewItem} on:keypress>New</i>
-            {#if data.derived.looseItems.length > 0}
-                <span class="inventory-title">Loose Items</span>
-            {/if}
-            {#each data.derived.looseItems as item}
-                <span class="inventory-item">
-                    <img src="{item.img}" alt="{item.name}" />
-                    {item.name}
-                    <i class="fas fa-pen-to-square" on:click={editItem(item)} on:keypress />
-                    <i class="fas fa-trash-can" on:click={deleteItem(item)} on:keypress />
-                </span>
-            {/each}
+            <!-- <span class="inventory-title">Equipment</span> -->
+            <!-- {#each actor.system.inventory as slot, i} -->
+            <!--     <div class="inventory-row"> -->
+            <!--         <span class="inventory-type" class:editMode>{slotTypeToText(slot.type)}</span> -->
+            <!--         <div class="inventory-block"> -->
+            <!--             {#each slot.items as item, j} -->
+            <!--                 {#if item.item == undefined} -->
+            <!--                     <span class="inventory-item"> -->
+            <!--                         <i class="fas fa-plus" on:click={addNewItem(item, i, j)} /> -->
+            <!--                     </span> -->
+            <!--                 {:else} -->
+            <!--                     <span class="inventory-item">{item.item.name}</span> -->
+            <!--                 {/if} -->
+            <!--             {/each} -->
+            <!--         </div> -->
+            <!--     </div> -->
+            <!-- {/each} -->
+            <!-- <i class="fas fa-plus" on:click={addNewItem} on:keypress>New</i> -->
+            <!-- {#if sheet.looseItems.length > 0} -->
+            <!--     <span class="inventory-title">Loose Items</span> -->
+            <!-- {/if} -->
+            <!-- {#each sheet.looseItems as item} -->
+            <!--     <span class="inventory-item"> -->
+            <!--         <img src="{item.img}" alt="{item.name}" /> -->
+            <!--         {item.name} -->
+            <!--         <i class="fas fa-pen-to-square" on:click={editItem(item)} on:keypress /> -->
+            <!--         <i class="fas fa-trash-can" on:click={deleteItem(item)} on:keypress /> -->
+            <!--     </span> -->
+            <!-- {/each} -->
         </section>
     </section>
 </main>

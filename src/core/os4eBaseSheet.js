@@ -1,92 +1,87 @@
-import { SvelteApplication }  from '@typhonjs-fvtt/runtime/svelte/application';
-import BaseSheetTemplate from './BaseSheetTemplate.svelte';
+import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
+import BaseSheetTemplate from "./BaseSheetTemplate.svelte";
 
-export default class os4eBaseSheet extends SvelteApplication
-{
-   #data;
-   #updateData;
-   #editImage;
-   #component;
-   #callbacks = {};
-   object;
+export default class os4eBaseSheet extends SvelteApplication {
+    #component; // Reference to the inner Svelte sheet template
+    object; // Reference to the document object (Actor/Item etc.)
 
-   constructor(object = {}, options = {}, component = false, callbacks = {}) 
-   {
-      super(options);
+    // Svelte template
+    get template() {
+        return this.svelte.applicationShell;
+    }
 
-      this.object = object;
+    constructor(
+        object = {}, // This is typically passed in by Foundry
+        options = {}, // This is typically passed in by Foundry
+        component = false // Sheets derived from os4eBaseSheet need to pass
+        // in the inner sheet template.
+    ) {
+        super(options); // SvelteApplication doesn't need object.
 
-      this.#data = {
-         id: object.id,
-         name: object.name,
-         img: object.img,
-         system: object.system,
-         derived: object.derived
-      };
+        // Save our document object for later use.
+        this.object = object;
 
-      this.#callbacks = callbacks;
+        // Store the inner sheet template component.
+        this.#component = component;
+    }
 
-      // Callback to update actor data
-      // this.#updateData = (data) => this.object.update(data);
-      this.#callbacks.update = (data) => this.object.update(data);
+    /**
+     * Default Application options
+     *
+     * @returns {object} options - Application options.
+     * @see https://foundryvtt.com/api/Application.html#options
+     */
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            title: "OS4e.title", // Automatically localized from `lang/en.json`.
+            width: 600,
+            height: 400,
 
+            svelte: {
+                class: BaseSheetTemplate, // Svelte base template
+                target: document.body, // Where we are rendering the sheet
+                props: function () {
+                    // This allows us to load in default
+                    // properties to the sheet.
+                    return {
+                        // We'll pass in the sheet and the document object
+                        sheet: this,
+                        doc: this.object,
+                        // The inner sheet template to render
+                        component: this.#component,
+                    };
+                },
+            },
+        });
+    }
 
-      // Callback up render file picker and update data when portrait is clicked.
-      // this.#editImage = (data) =>
-      this.#callbacks.editImage = (data) =>
-      {
-         // TODO: Replace with Tokenizer-like functionality.
-         // Instantiate a new file picker
-         const picker = new FilePicker();
-         // When the file is picked...
-         picker.callback = (e) =>
-         {
-            // Update the returned data object with the newly
-            // picked image path.
-            data.img = e;
-            // Send the data back to the component
-            this.svelte.applicationShell.$set({ data });
-            // Update the actor's data
-            this.object.update(data);
-         };
-         picker.render(true);
-      };
+    async editImage() {
+        // TODO: Replace with Tokenizer-like functionality.
+        // Instantiate a new file picker.
+        const picker = new FilePicker();
+        // When the file is picked...
+        picker.callback = async (imgPath) => {
+            // Update  the returned data object with the newly picked image path.
+            this.object.img = imgPath;
 
-      // Store the inner component
-      this.#component = component;
-   }
+            // Save object data to Foundry.
+            await this.object.update({ _id: this.object.id, img: imgPath });
 
-   /**
-    * Default Application options
-    *
-    * @returns {object} options - Application options.
-    * @see https://foundryvtt.com/api/Application.html#options
-    */
-   static get defaultOptions()
-   {
-      return foundry.utils.mergeObject(super.defaultOptions, {
-         title: 'OS4e.title',  // Automatically localized from `lang/en.json`.
-         width: 600,
-         height: 400,
+            console.log(this.object);
+            this.template.doc.img = imgPath;
+            this.template.doc = this.template.doc;
+            // Force a refresh of the Svelte template's data.
+            // Nessecary becase Svelte won't update reactive data on mutation.
+            // this.refresh();
+        };
+        // Render the picker.
+        picker.render(true);
+    }
 
-         svelte: {
-            class: BaseSheetTemplate,
-            target: document.body,
-            props: function() 
-            {
-               return {
-                  sheet: this,
-                  data: this.#data,
-                  callbacks: this.#callbacks,
-                  component: this.#component,
-               };
-            }
-         }
-      });
-   }
-
-   async refresh()
-   {
-      this.#data.refresh();
-   }
+    async refresh() {
+        // Force a refresh of the Svelte template's data.
+        // Nessecary becase Svelte won't update reactive data on mutation.
+        // this.template.$set({ doc: this.object, sheet: this });
+        this.template.$set({ doc: this.object });
+    }
 }

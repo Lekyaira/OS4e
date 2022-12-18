@@ -4,42 +4,36 @@
  
    export let elementRoot;
 
-   // Sheet class
+   // Sheet
    export let sheet;
+   // Document
+   export let doc;
 
-   // Actor data passed in from os4eActorSheet.js
-   export let data;
-   data.refresh = refreshSheet;
-
-   // Inner component
+   // Inner sheet template component
    export let component = false;
-
-   // Callbacks
-   export let callbacks = {};
-
-   // Callback to allow os4eActorSheet.js to update the actor data.
-   // export let update = () => {};
-
-   // Callback to render file picker when portrait is clicked.
-   // export let editImage = () => {};
 
    // External application
    const application = getContext('external').application;
 
    // Two-way binding to title, sets title to the object's name.
    const storeTitle = application.reactive.storeAppOptions.title;
-   $: $storeTitle = data.name;
+   $: $storeTitle = doc.name;
 
    // Update data when input fields are changed
    onMount(async () =>
    {
-      window.$('input').on('change', () => callbacks.update(data));
+           // Set the onChange event for all inputs
+           window.$('input').on('change', function() {
+               // Create update data with our document id.
+               let docData = {_id: doc.id};
+               // Get the calling element's name and value and update the data.
+               docData[window.$(this).attr('name')] = window.$(this).val();
+               // Update our document with the changes.
+               doc.update(docData);
+           });
+           // Refresh the sheet template data.
+           sheet.refresh();
    });
-
-   async function refreshSheet()
-   {
-      data = data;
-   }
 </script>
  
 <!-- This is necessary for Svelte to generate accessors TRL can access for `elementRoot` -->
@@ -48,5 +42,12 @@
 <!-- ApplicationShell provides the popOut / application shell frame, header bar, content areas -->
 <!-- ApplicationShell exports `elementRoot` which is the outer application shell element -->
 <ApplicationShell bind:elementRoot>
-   <svelte:component this={component} bind:elementRoot={elementRoot} bind:sheet={sheet} bind:data={data} callbacks={callbacks} />
+    <!-- svelte:component tag represents our inner sheet template data. -->
+    <!-- "this" is the Svelte componente we're rendering on this sheet. -->
+    <!-- "sheet" is the sheet object that controls the sheet rendering. -->
+    <!-- "doc" is the document object (Actor, Item, etc.) that handles the actual data representation. -->
+   <svelte:component 
+        this={component} 
+        bind:sheet={sheet} 
+        bind:doc={doc} />
 </ApplicationShell>
