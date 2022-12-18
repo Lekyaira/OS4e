@@ -25,14 +25,14 @@
            // Set the onChange event for all inputs
            window.$('input').on('change', function() {
                // Create update data with our document id.
-               let docData = {_id: doc.id};
+               let docData = {_id: $doc.id};
                // Get the calling element's name and value and update the data.
                docData[window.$(this).attr('name')] = window.$(this).val();
                // Update our document with the changes.
-               doc.update(docData);
+               $doc.update(docData);
            });
            // Refresh the sheet template data.
-           sheet.refresh();
+           // sheet.refresh();
    });
 </script>
  

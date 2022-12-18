@@ -1,9 +1,11 @@
 import { SvelteApplication } from "@typhonjs-fvtt/runtime/svelte/application";
+import { TJSDocument } from "@typhonjs-fvtt/runtime/svelte/store";
 import BaseSheetTemplate from "./BaseSheetTemplate.svelte";
 
 export default class os4eBaseSheet extends SvelteApplication {
     #component; // Reference to the inner Svelte sheet template
     object; // Reference to the document object (Actor/Item etc.)
+    #document; // Reference to the TJSDocument object that contains object.
 
     // Svelte template
     get template() {
@@ -20,6 +22,13 @@ export default class os4eBaseSheet extends SvelteApplication {
 
         // Save our document object for later use.
         this.object = object;
+        // this.object = object;
+        //
+        // Create a new TJSDocument using the document object passed in from Foundry.
+        // This is so that the Svelte component updates reactively.
+        this.#document = new TJSDocument(object, {
+            delete: this.close.bind(this),
+        });
 
         // Store the inner sheet template component.
         this.#component = component;
@@ -46,7 +55,7 @@ export default class os4eBaseSheet extends SvelteApplication {
                     return {
                         // We'll pass in the sheet and the document object
                         sheet: this,
-                        doc: this.object,
+                        doc: this.#document,
                         // The inner sheet template to render
                         component: this.#component,
                     };
@@ -68,8 +77,8 @@ export default class os4eBaseSheet extends SvelteApplication {
             await this.object.update({ _id: this.object.id, img: imgPath });
 
             console.log(this.object);
-            this.template.doc.img = imgPath;
-            this.template.doc = this.template.doc;
+            // this.template.doc.img = imgPath;
+            // this.template.doc = this.template.doc;
             // Force a refresh of the Svelte template's data.
             // Nessecary becase Svelte won't update reactive data on mutation.
             // this.refresh();
@@ -77,11 +86,11 @@ export default class os4eBaseSheet extends SvelteApplication {
         // Render the picker.
         picker.render(true);
     }
-
-    async refresh() {
-        // Force a refresh of the Svelte template's data.
-        // Nessecary becase Svelte won't update reactive data on mutation.
-        // this.template.$set({ doc: this.object, sheet: this });
-        this.template.$set({ doc: this.object });
-    }
+    //
+    // async refresh() {
+    //     // Force a refresh of the Svelte template's data.
+    //     // Nessecary becase Svelte won't update reactive data on mutation.
+    //     // this.template.$set({ doc: this.object, sheet: this });
+    //     this.template.$set({ doc: this.object });
+    // }
 }

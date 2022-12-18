@@ -65,8 +65,8 @@
         }
 
         // Update portrait image position from saved data
-        if(actor.system.portraitPosition){
-            objectPosition = actor.system.portraitPosition;
+        if($actor.system.portraitPosition){
+            objectPosition = $actor.system.portraitPosition;
         }
     }); 
 
@@ -103,9 +103,9 @@
             start.y = 0;
             offset.x = 0;
             offset.y = 0;
-            actor.system.portraitPosition = objectPosition;
+            $actor.system.portraitPosition = objectPosition;
             // Save actor data to Foundry database.
-            actor.update({_id: actor.id, system: {portraitPosition: objectPosition}});
+            $actor.update({_id: $actor.id, system: {portraitPosition: objectPosition}});
         }, 50);
     }
 
@@ -137,7 +137,7 @@
 
     async function deleteItem(item)
     {
-        await Item.deleteDocuments([item.id], { parent: actor });
+        await Item.deleteDocuments([item.id], { parent: $actor });
     }
 
     async function editItem(item)
@@ -160,7 +160,7 @@
         on:keypress
         style:color={editMode ? 'black' : 'gray'} />
     <header>
-        <img src={actor.img} alt="{actor.name}'s portrait" bind:this={img}
+        <img src={$actor.img} alt="{$actor.name}'s portrait" bind:this={img}
             class:editMode
             style:object-position={`${objectPosition.x}px ${objectPosition.y}px`}
             style:object-fit={objectFit}
@@ -173,7 +173,7 @@
         </div>
         <section id="info-block">
             <section id="title-block">
-                <input id="name" name="name" type="text" bind:value={actor.name} />
+                <input id="name" name="name" type="text" bind:value={$actor.name} />
                 <span id="title">Level 1 Beastkin Fighter</span>
             </section>
             <!--Ability Scores-->
@@ -187,25 +187,25 @@
                 </section>
                 <section id="score-base-values" class="score-values"
                     style:display={editMode ? "initial" : "none"}>
-                    <input type="number" id="score-base-strength" name="system.abilities.strength" bind:value={actor.system.abilities.strength} />
-                    <input type="number" id="score-base-dexterity" name="system.abilities.dexterity" bind:value={actor.system.abilities.dexterity} />
-                    <input type="number" id="score-base-charisma" name="system.abilities.charisma" bind:value={actor.system.abilities.charisma} />
-                    <input type="number" id="score-base-intelligence" name="system.abilities.intelligence" bind:value={actor.system.abilities.intelligence} />
-                    <input type="number" id="score-base-luck" name="system.abilities.luck" bind:value={actor.system.abilities.luck} />
+                    <input type="number" id="score-base-strength" name="system.abilities.strength" bind:value={$actor.system.abilities.strength} />
+                    <input type="number" id="score-base-dexterity" name="system.abilities.dexterity" bind:value={$actor.system.abilities.dexterity} />
+                    <input type="number" id="score-base-charisma" name="system.abilities.charisma" bind:value={$actor.system.abilities.charisma} />
+                    <input type="number" id="score-base-intelligence" name="system.abilities.intelligence" bind:value={$actor.system.abilities.intelligence} />
+                    <input type="number" id="score-base-luck" name="system.abilities.luck" bind:value={$actor.system.abilities.luck} />
                 </section>
                 <section id="score-derived-values" class="score-values">
-                    <span>{actor.derived.strength}</span>
-                    <span>{actor.derived.dexterity}</span>
-                    <span>{actor.derived.charisma}</span>
-                    <span>{actor.derived.intelligence}</span>
-                    <span>{actor.derived.luck}</span>
+                    <span>{$actor.derived.strength}</span>
+                    <span>{$actor.derived.dexterity}</span>
+                    <span>{$actor.derived.charisma}</span>
+                    <span>{$actor.derived.intelligence}</span>
+                    <span>{$actor.derived.luck}</span>
                 </section>
                 <section id="score-modifiers" class="score-values">
-                    <span>({formatModifier(actor.derived.str)})</span>
-                    <span>({formatModifier(actor.derived.dex)})</span>
-                    <span>({formatModifier(actor.derived.cha)})</span>
-                    <span>({formatModifier(actor.derived.int)})</span>
-                    <span>({formatModifier(actor.derived.luk)})</span>
+                    <span>({formatModifier($actor.derived.str)})</span>
+                    <span>({formatModifier($actor.derived.dex)})</span>
+                    <span>({formatModifier($actor.derived.cha)})</span>
+                    <span>({formatModifier($actor.derived.int)})</span>
+                    <span>({formatModifier($actor.derived.luk)})</span>
                 </section>
                 <!--Defenses-->
                 <section id="defense-labels">
@@ -215,10 +215,10 @@
                     <span>Insight</span>
                 </section>
                 <section id="defense-values" class="score-values">
-                    <span>{actor.derived.fortitude}</span>
-                    <span>{actor.derived.reflexes}</span>
-                    <span>{actor.derived.will}</span>
-                    <span>{actor.derived.insight}</span>
+                    <span>{$actor.derived.fortitude}</span>
+                    <span>{$actor.derived.reflexes}</span>
+                    <span>{$actor.derived.will}</span>
+                    <span>{$actor.derived.insight}</span>
                 </section>
             </section>
             <!--Stats-->
@@ -247,7 +247,7 @@
                 </section>
                 <section>
                     <span>0</span>
-                    <span>{actor.derived.sp}sq.</span>
+                    <span>{$actor.derived.sp}sq.</span>
                 </section>
             </section>
         </section>
